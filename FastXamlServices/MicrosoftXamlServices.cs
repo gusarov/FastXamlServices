@@ -73,7 +73,9 @@ namespace FastXamlServices
 			XamlServices.Save(stream, instance);
 		}
 
-
-
+		public void Save(StreamWriter stream, object instance)
+		{
+			XamlServices.Save(stream, instance);
+		}
 	}
 }

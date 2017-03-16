@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastXamlServices", "FastXamlServices\FastXamlServices.csproj", "{D4770F33-FB79-4797-8FCB-F5607F56C900}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastXamlServices.UnitTests", "FastXamlServices.UnitTests\FastXamlServices.UnitTests.csproj", "{99F5AEAA-5F0F-4465-8FE7-631EBA7C88F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{D4770F33-FB79-4797-8FCB-F5607F56C900}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4770F33-FB79-4797-8FCB-F5607F56C900}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4770F33-FB79-4797-8FCB-F5607F56C900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99F5AEAA-5F0F-4465-8FE7-631EBA7C88F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99F5AEAA-5F0F-4465-8FE7-631EBA7C88F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99F5AEAA-5F0F-4465-8FE7-631EBA7C88F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99F5AEAA-5F0F-4465-8FE7-631EBA7C88F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
