@@ -45,5 +45,7 @@ namespace FastXamlServices
 		/// <exception cref="T:System.ArgumentNullException">
 		/// <paramref name="stream" /> input is null.</exception>
 		void Save(Stream stream, object instance);
+
+		void Save(StreamWriter stream, object instance);
 	}
 }

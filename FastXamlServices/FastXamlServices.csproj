@@ -41,10 +41,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\DynamicInvokeOptimizer.cs" />
+    <Compile Include="Internal\IMetadataProvider.cs" />
+    <Compile Include="Internal\TypeMetadataRegister.cs" />
+    <Compile Include="MetadataProviderDynamic\Element.cs" />
+    <Compile Include="MetadataProviderDynamic\TypeMetadata.cs" />
     <Compile Include="MicrosoftXamlServices.cs" />
     <Compile Include="FastXamlServices.cs" />
     <Compile Include="IXamlServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Internal\CodeEmitUtils.cs" />
+    <Compile Include="MetadataProviderDynamic\DynamicMetadataProvider.cs" />
+    <Compile Include="Internal\SerializationContext.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MetadataProviderStatic\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
