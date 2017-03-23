@@ -192,7 +192,7 @@ namespace FastXamlServices.MetadataProviderDynamic
 			var ct = GetTypeConverter(value.GetType());
 			if (ct != null)
 			{
-				return ct.ConvertToString(value);
+				return ct.ConvertToInvariantString(value);
 			}
 			return value.ToString();
 		}
