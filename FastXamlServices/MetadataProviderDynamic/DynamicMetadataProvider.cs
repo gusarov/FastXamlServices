@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FastXamlServices.Internal;
@@ -128,7 +130,7 @@ namespace FastXamlServices.MetadataProviderDynamic
 			// PROPERTY as ATTRIBUTE:
 			// primitive
 			// composite null
-			foreach (var element in elements/*.OrderBy(x => x.Name)*/)
+			foreach (var element in elements.OrderBy(x => x.Name))
 			{
 				var val = element.GetValue(instance);
 				if (IsInAttrib(val))
@@ -140,10 +142,59 @@ namespace FastXamlServices.MetadataProviderDynamic
 							var x = ctx.GetAliasFor("http://schemas.microsoft.com/winfx/2006/xaml");
 							val = $"{{{x}:Null}}";
 						}
+						val = ConvertToString(val);
 						ctx.Write($@" {element.Name}=""{val}""");
 					}
 				}
 			}
+		}
+
+		private static readonly Dictionary<Type, TypeConverter> _typeConverters = new Dictionary<Type, TypeConverter>();
+
+		private TypeConverter GetTypeConverter(Type type)
+		{
+			TypeConverter typeConverter;
+			if (!_typeConverters.TryGetValue(type, out typeConverter))
+			{
+				_typeConverters[type] = typeConverter = GetTypeConverterCore(type);
+			}
+			return typeConverter;
+		}
+
+		private TypeConverter GetTypeConverterCore(Type type)
+		{
+			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+			{
+				return GetTypeConverterCore(type.GetGenericArguments()[0]);
+			}
+
+			var c = TypeDescriptor.GetConverter(type);
+			return c;
+			/*
+			var cvta = (TypeConverterAttribute)type.GetCustomAttributes(typeof(TypeConverterAttribute), true).FirstOrDefault();
+			if (cvta != null)
+			{
+				var aqn = cvta.ConverterTypeName;
+				var cvtType = Type.GetType(aqn, true);
+				var ct = (TypeConverter)Activator.CreateInstance(cvtType);
+				return ct;
+			}
+			return null;
+			*/
+		}
+
+		private string ConvertToString(object value)
+		{
+			if (value is DateTime)
+			{
+				return ((DateTime)value).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK"); // modified ISO 8601 (without trailing zeros)
+			}
+			var ct = GetTypeConverter(value.GetType());
+			if (ct != null)
+			{
+				return ct.ConvertToString(value);
+			}
+			return value.ToString();
 		}
 
 		bool IsInAttrib(object propertyValue)

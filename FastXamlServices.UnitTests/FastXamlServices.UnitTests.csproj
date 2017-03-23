@@ -51,13 +51,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="SampleData\Amount.cs" />
     <Compile Include="BasePerformanceUnitTest.cs" />
     <Compile Include="DynamicInvokeOptimizerTest.cs" />
     <Compile Include="EncodingPerformanceUnitTest.cs" />
     <Compile Include="FastXamlPerformanceUnitTest.cs" />
     <Compile Include="PerformanceHelper.cs" />
-    <Compile Include="Sample.cs" />
-    <Compile Include="SampleWithPrimitiveCollection.cs" />
+    <Compile Include="SampleData\Sample.cs" />
+    <Compile Include="SampleData\Utils.cs" />
     <Compile Include="Serializers\SampleSerializer.cs" />
     <Compile Include="SerializerTests.cs" />
     <Compile Include="MicrosoftPerformanceUnitTest.cs" />

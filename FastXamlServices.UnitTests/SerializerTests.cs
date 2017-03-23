@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -15,7 +17,10 @@ namespace FastXamlServices.UnitTests
 		public void Init()
 		{
 			_notExact = false;
+			_initialCi = Thread.CurrentThread.CurrentCulture;
 		}
+
+		private CultureInfo _initialCi;
 
 		[TestCleanup]
 		public void Clean()
@@ -24,17 +29,17 @@ namespace FastXamlServices.UnitTests
 			{
 				Assert.Inconclusive("Not Exactly matched, but works");
 			}
+			Thread.CurrentThread.CurrentCulture = _initialCi;
 		}
 
 		[TestMethod]
 		public void Should_10_serialize_simple_node()
 		{
-			var data = new Sample
+			Verify(new Sample
 			{
 				Prop1 = "asd",
 				Prop2 = 123,
-			};
-			Verify(data);
+			});
 		}
 
 		[TestMethod]
@@ -97,7 +102,14 @@ namespace FastXamlServices.UnitTests
 		[TestMethod]
 		public void Should_30_respect_default_value()
 		{
-			Assert.Inconclusive();
+			Verify(new SampleDefaulted
+			{
+				DefaultedEnum = TradeTypeDto.Sell,
+			});
+			Verify(new SampleDefaulted
+			{
+				DefaultedEnum = TradeTypeDto.Buy,
+			});
 		}
 
 		[TestMethod]
@@ -120,29 +132,75 @@ namespace FastXamlServices.UnitTests
 		{
 			Assert.Inconclusive();
 		}
+
 		[TestMethod]
 		public void Should_30_be_culture_independant()
 		{
-			Assert.Inconclusive();
+			var data = new Sample
+			{
+				DateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6),
+				Amount = 1001000m,
+			};
+
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("ru-RU", false);
+			Verify(data);
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
+			Verify(data);
+
 		}
 
-		bool _notExact = true;
+		[TestMethod]
+		public void Should_30_store_details()
+		{
+			var data = new Sample
+			{
+				DateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6),
+				Amount = 1001000.123456789m,
+			};
+
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("ru-RU", false);
+			Verify(data);
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
+			Verify(data);
+
+		}
+
+		[TestMethod]
+		public void Should_30_be_time_zone_independant()
+		{
+			var data = new Sample
+			{
+				DateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6),
+			};
+			data.DateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Unspecified);
+			Verify(data);
+			data.DateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Local);
+			Verify(data);
+			data.DateTime = new DateTime(2000, 1, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+			Verify(data);
+		}
+
+		bool _notExact;
 
 		private void Verify(object data)
 		{
 			var ms = new MicrosoftXamlServices();
 			var exp = ms.Save(data);
-			WriteTrace(exp);
+			WriteTrace(exp, "Expected");
 			var act = new FastXamlServices().Save(data);
-			WriteTrace(act);
+			WriteTrace(act, "Actual");
 			var react = ms.Save(ms.Parse(act));
-			WriteTrace(react);
+			WriteTrace(react, "Resaved via ms");
 			Assert.AreEqual(exp, react);
-			_notExact = !string.Equals(exp, act, StringComparison.Ordinal);
+			if (!string.Equals(exp, act, StringComparison.Ordinal))
+			{
+				_notExact = true;
+			}
 		}
 
-		private static void WriteTrace(string str)
+		private static void WriteTrace(string str, string title)
 		{
+			Trace.WriteLine(title + ":");
 			Trace.WriteLine(str);
 			Trace.WriteLine(string.Join("", str.Select(x =>" "+ ((int)x).ToString("X2") + (x == (int)'\n' ? "\r\n" : null))));
 		}
