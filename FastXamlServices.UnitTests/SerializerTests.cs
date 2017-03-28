@@ -167,6 +167,24 @@ namespace FastXamlServices.UnitTests
 		}
 
 		[TestMethod]
+		public void Should_30_store_details_date()
+		{
+			var data = new Sample
+			{
+				DateTime = new DateTime(2000, 1, 2),
+			};
+
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("ru-RU", false);
+			var act = Verify(data);
+
+			Assert.IsTrue(act.Contains("\"2000-01-02\""), "Should contains date without time");
+
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
+			Verify(data);
+
+		}
+
+		[TestMethod]
 		public void Should_30_be_time_zone_independant()
 		{
 			var data = new Sample
@@ -195,7 +213,7 @@ namespace FastXamlServices.UnitTests
 
 		bool _notExact;
 
-		private void Verify(object data)
+		private string Verify(object data)
 		{
 			var ms = new MicrosoftXamlServices();
 			var fx = new FastXamlServices();
@@ -218,6 +236,8 @@ namespace FastXamlServices.UnitTests
 			{
 				_notExact = true;
 			}
+
+			return act;
 		}
 
 		private static void WriteTrace(string str, string title)

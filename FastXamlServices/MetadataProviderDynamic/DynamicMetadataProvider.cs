@@ -274,11 +274,17 @@ foreach (var attrib in nodeAttribs)
 			return c;
 		}
 
+
 		private string ConvertToString(object value)
 		{
 			if (value is DateTime)
 			{
-				return ((DateTime)value).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK"); // modified ISO 8601 (without trailing zeros)
+				var dt = (DateTime)value;
+				if (dt.TimeOfDay == default(TimeSpan))
+				{
+					return dt.ToString("yyyy'-'MM'-'dd");
+				}
+				return dt.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK"); // modified ISO 8601 (without trailing zeros)
 			}
 			var ct = GetTypeConverter(value.GetType());
 			if (ct != null)
@@ -290,8 +296,24 @@ foreach (var attrib in nodeAttribs)
 
 		private object ConvertFromString(Type expected, string str)
 		{
+			if (str == "{x:Null}") // the only currently supported Markup Extension - hardcoded 
+			{
+				return null;
+			}
+
+			if (expected == typeof(DateTime) || expected == typeof(DateTime?))
+			{
+				DateTime dt;
+				var nd = DateTime.TryParse(str, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dt);
+				if (nd)
+				{
+					return dt;
+				}
+				throw new Exception("Unable to parse datetime: " + str);
+			}
+
 			var ct = GetTypeConverter(expected);
-			if (ct != null)
+			if (ct != null && ct.CanConvertFrom(typeof(string)))
 			{
 				return ct.ConvertFromInvariantString(str);
 			}
