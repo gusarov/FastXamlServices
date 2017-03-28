@@ -8,19 +8,19 @@ using System.Windows.Markup;
 
 namespace FastXamlServices.Internal
 {
-	public class SerializationContex1t
+	public abstract class SerializationContext
 	{
 		public string RootNamespace;
 		public Dictionary<string, string> NamespaceToAlias = new Dictionary<string, string>();
 		public Dictionary<string, string> AliasToNamespace = new Dictionary<string, string>();
 	}
 
-	public class SerializationReaderContext : SerializationContex1t
+	public class SerializationReaderContext : SerializationContext
 	{
 		private static readonly Dictionary<Assembly, AssemblyKnownTypes> _assemblyKnownTypes = new Dictionary<Assembly, AssemblyKnownTypes>();
 		class AssemblyKnownTypes
 		{
-			public Dictionary<string, Dictionary<string, Type>> XmlNses = new Dictionary<string, Dictionary<string, Type>>();
+			public readonly Dictionary<string, Dictionary<string, Type>> XmlNses = new Dictionary<string, Dictionary<string, Type>>();
 		}
 
 		static void AnalyzeAssembly(Assembly asm)
@@ -97,7 +97,7 @@ namespace FastXamlServices.Internal
 		public IDictionary<string, string> CurrentNodeAttribs;
 	}
 
-	public class SerializationWriterContext : SerializationContex1t
+	public class SerializationWriterContext : SerializationContext
 	{
 		public bool XmlnsEmited
 		{
