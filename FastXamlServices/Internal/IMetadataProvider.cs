@@ -8,6 +8,7 @@ namespace FastXamlServices.Internal
 {
 	interface IMetadataProvider
 	{
-
+		Action<SerializationWriterContext, object> GetWriter(Type type);
+		Func<SerializationReaderContext, object> GetReader(Type type);
 	}
 }

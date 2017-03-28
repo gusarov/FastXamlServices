@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\DictionaryExtensions.cs" />
     <Compile Include="Internal\DynamicInvokeOptimizer.cs" />
     <Compile Include="Internal\IMetadataProvider.cs" />
     <Compile Include="Internal\TypeMetadataRegister.cs" />
@@ -52,7 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Internal\CodeEmitUtils.cs" />
     <Compile Include="MetadataProviderDynamic\DynamicMetadataProvider.cs" />
-    <Compile Include="Internal\SerializationContext.cs" />
+    <Compile Include="Internal\SerializationWriterContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MetadataProviderStatic\" />

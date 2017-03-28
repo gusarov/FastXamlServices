@@ -18,6 +18,8 @@ namespace FastXamlServices
 		/// <paramref name="stream" /> is null.</exception>
 		object Load(Stream stream);
 
+		object Load(TextReader reader);
+
 		/// <summary>Reads XAML as string output and returns an object graph.</summary>
 		/// <returns>The object graph that is returned.</returns>
 		/// <param name="xaml">The XAML string input to parse.</param>
@@ -46,6 +48,6 @@ namespace FastXamlServices
 		/// <paramref name="stream" /> input is null.</exception>
 		void Save(Stream stream, object instance);
 
-		void Save(StreamWriter stream, object instance);
+		void Save(TextWriter writer, object instance);
 	}
 }

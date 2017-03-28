@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
-namespace FastXamlServices.UnitTests
+namespace FastXamlServices.UnitTests.SampleData
 {
 
 	public class AmountConverter : TypeConverter

@@ -1,4 +1,4 @@
-namespace FastXamlServices.UnitTests
+namespace FastXamlServices.UnitTests.SampleData
 {
 	static class Utils
 	{

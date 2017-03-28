@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 
-namespace FastXamlServices.UnitTests
+namespace FastXamlServices.UnitTests.SampleData
 {
 	public class Sample
 	{
@@ -21,13 +17,12 @@ namespace FastXamlServices.UnitTests
 		public Amount? Amount { get; set; }
 	}
 
-
-
 	public class SampleWithComposite : Sample
 	{
 		[DefaultValue(null)]
 		public Sample MainSample { get; set; }
 	}
+
 	public class SampleDefaulted
 	{
 		[DefaultValue(TradeTypeDto.Sell)]

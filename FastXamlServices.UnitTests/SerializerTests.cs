@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FastXamlServices.UnitTests.SampleData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FastXamlServices.UnitTests
@@ -180,18 +181,39 @@ namespace FastXamlServices.UnitTests
 			Verify(data);
 		}
 
+		[TestMethod]
+		public void Should_30_serialize_as_propery_when_instance_have_string_converter()
+		{
+			Assert.Inconclusive();
+		}
+
+		[TestMethod]
+		public void Should_30_serialize_as_subnode_when_instance_not_have_string_converter()
+		{
+			Assert.Inconclusive();
+		}
+
 		bool _notExact;
 
 		private void Verify(object data)
 		{
 			var ms = new MicrosoftXamlServices();
+			var fx = new FastXamlServices();
+
 			var exp = ms.Save(data);
 			WriteTrace(exp, "Expected");
 			var act = new FastXamlServices().Save(data);
 			WriteTrace(act, "Actual");
-			var react = ms.Save(ms.Parse(act));
-			WriteTrace(react, "Resaved via ms");
-			Assert.AreEqual(exp, react);
+
+			var reSaveMs = ms.Save(ms.Parse(act));
+			WriteTrace(reSaveMs, "Resaved via Microsoft XamlServices");
+			Assert.AreEqual(exp, reSaveMs);
+
+			var reSaveFx = fx.Save(fx.Parse(act));
+			WriteTrace(reSaveFx, "Resaved via FastXamlServices");
+			Assert.AreEqual(act, reSaveFx);
+
+
 			if (!string.Equals(exp, act, StringComparison.Ordinal))
 			{
 				_notExact = true;

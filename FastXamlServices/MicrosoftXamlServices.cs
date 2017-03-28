@@ -31,6 +31,11 @@ namespace FastXamlServices
 			return XamlServices.Load(stream);
 		}
 
+		public object Load(TextReader reader)
+		{
+			return XamlServices.Load(reader);
+		}
+
 		/// <summary>Reads XAML as string output and returns an object graph.</summary>
 		/// <returns>The object graph that is returned.</returns>
 		/// <param name="xaml">The XAML string input to parse.</param>
@@ -40,8 +45,6 @@ namespace FastXamlServices
 		{
 			return XamlServices.Parse(xaml);
 		}
-
-
 
 		/// <summary>Processes a provided object tree into a XAML node representation, and returns a string representation of the output XAML.</summary>
 		/// <returns>The XAML markup output as a string. </returns>
@@ -73,9 +76,9 @@ namespace FastXamlServices
 			XamlServices.Save(stream, instance);
 		}
 
-		public void Save(StreamWriter stream, object instance)
+		public void Save(TextWriter writer, object instance)
 		{
-			XamlServices.Save(stream, instance);
+			XamlServices.Save(writer, instance);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using FastXamlServices.UnitTests.SampleData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FastXamlServices.UnitTests
@@ -19,15 +20,15 @@ namespace FastXamlServices.UnitTests
 			};
 			Save(data);
 			var perf = PerformanceHelper.Performance(() => Save(data));
-			Assert.Inconclusive($"{perf:N} OpS");
+			Assert.Inconclusive($"{perf:N0} OpS");
 		}
 
 		[TestMethod]
 		public void LoadPerformance()
 		{
-			var sample = "<Sample xmlns='test' />";
+			var sample = "<Sample xmlns=\"test\"/>";
 			var perf = PerformanceHelper.Performance(() => Load<Sample>(sample));
-			Assert.Inconclusive($"{perf:N} OpS");
+			Assert.Inconclusive($"{perf:N0} OpS");
 		}
 	}
 }

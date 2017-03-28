@@ -14,7 +14,7 @@ namespace FastXamlServices.MetadataProviderDynamic
 {
 	class DynamicMetadataProvider : IMetadataProvider
 	{
-		public static DynamicMetadataProvider Instance = new DynamicMetadataProvider();
+		public static readonly IMetadataProvider Instance = new DynamicMetadataProvider();
 
 		private DynamicMetadataProvider()
 		{
@@ -38,12 +38,114 @@ namespace FastXamlServices.MetadataProviderDynamic
 			return GetTypeMetada(type).Elements;
 		}
 
-		public Action<SerializationContext, object> GetWriter(Type type)
+		public Action<SerializationWriterContext, object> GetWriter(Type type)
 		{
 			return UniversalWriter;
 		}
 
-		void UniversalWriter(SerializationContext ctx, object instance)
+		public Func<SerializationReaderContext, object> GetReader(Type type)
+		{
+			/*
+
+var obj = Activator.CreateInstance(type);
+
+foreach (var attrib in nodeAttribs)
+{
+	type.GetProperty(attrib.Key).SetValue(obj, attrib.Value);
+}
+*/
+			return ctx => UniversalReader(ctx, type);
+		}
+
+		/*
+		object ReadNodeObject(SerializationReaderContext ctx, int from)
+		{
+			var nodeAttribs = ReadAttributes(ctx, from);
+			if (!ctx.NamespaceToAlias.Any())
+			{
+				ReadSystemAttributes(ctx, nodeAttribs);
+			}
+			string nodeType = ParseNodeType(ctx, from);
+			var type = ctx.GetType(nodeType);
+			var obj = Activator.CreateInstance(type);
+
+			foreach (var attrib in nodeAttribs)
+			{
+				type.GetProperty(attrib.Key).SetValue(obj, attrib.Value);
+			}
+
+			return obj;
+		}
+
+		void ReadSystemAttributes(SerializationReaderContext ctx, IDictionary<string, string> attribs)
+		{
+			foreach (var kvp in attribs.ToArray())
+			{
+				if (kvp.Key == "xmlns")
+				{
+					ctx.RootNamespace = kvp.Value;
+					attribs.Remove(kvp);
+				}
+				if (kvp.Key.StartsWith("xmlns:"))
+				{
+					var i = kvp.Key.IndexOf(':');
+					var pref = kvp.Key.Substring(i + 1);
+					ctx.NamespaceToAlias[kvp.Value] = pref;
+					ctx.AliasToNamespace[pref] = kvp.Value;
+					attribs.Remove(kvp);
+				}
+			}
+		}
+
+		string ParseNodeType(SerializationReaderContext ctx, int from)
+		{
+			int indexOfNodeNickStart = ctx.Xaml.IndexOf('<', from) + 1;
+			int indexOfNodeNickEnd = ctx.Xaml.IndexOf(' ', indexOfNodeNickStart);
+			string nodeType = ctx.Xaml.Substring(indexOfNodeNickStart, indexOfNodeNickEnd - indexOfNodeNickStart);
+			return nodeType;
+		}
+
+		IDictionary<string, string> ReadAttributes(SerializationReaderContext ctx, int from)
+		{
+			var dic = new Dictionary<string, string>();
+			int indexOfNodeEnd = ctx.Xaml.IndexOf('>', from);
+			int i = from;
+			do
+			{
+				i = ctx.Xaml.IndexOf(' ', i + 1);
+				int iProNameEnd = ctx.Xaml.IndexOf('=', i);
+				if (iProNameEnd < 0)
+				{
+					break;
+				}
+				string proName = ctx.Xaml.Substring(i, iProNameEnd - i).Trim();
+				int iProValStart = ctx.Xaml.IndexOf('"', i) + 1;
+				int iProValEnd = ctx.Xaml.IndexOf('"', iProValStart + 1);
+				string proVal = ctx.Xaml.Substring(iProValStart, iProValEnd - iProValStart);
+				dic[proName] = proVal;
+			} while (i < indexOfNodeEnd && i >= 0);
+			return dic;
+		}
+		*/
+
+		object UniversalReader(SerializationReaderContext ctx, Type type)
+		{
+			var obj = Activator.CreateInstance(type);
+
+			foreach (var attrib in ctx.CurrentNodeAttribs)
+			{
+				var pi = type.GetProperty(attrib.Key);
+				if (pi == null)
+				{
+					throw new Exception($"Property {attrib.Key} not found");
+				}
+				pi.SetValue(obj, ConvertFromString(pi.PropertyType, attrib.Value));
+			}
+
+			return obj;
+		}
+
+		void UniversalWriter(SerializationWriterContext ctx, object instance)
 		{
 			var type = instance.GetType();
 			var meta = GetTypeMetada(type);
@@ -125,7 +227,7 @@ namespace FastXamlServices.MetadataProviderDynamic
 			return new string(' ', c * 2);
 		}
 
-		void UniversalWriterAttributes(SerializationContext ctx, object instance, IEnumerable<Element> elements)
+		void UniversalWriterAttributes(SerializationWriterContext ctx, object instance, IEnumerable<Element> elements)
 		{
 			// PROPERTY as ATTRIBUTE:
 			// primitive
@@ -170,17 +272,6 @@ namespace FastXamlServices.MetadataProviderDynamic
 
 			var c = TypeDescriptor.GetConverter(type);
 			return c;
-			/*
-			var cvta = (TypeConverterAttribute)type.GetCustomAttributes(typeof(TypeConverterAttribute), true).FirstOrDefault();
-			if (cvta != null)
-			{
-				var aqn = cvta.ConverterTypeName;
-				var cvtType = Type.GetType(aqn, true);
-				var ct = (TypeConverter)Activator.CreateInstance(cvtType);
-				return ct;
-			}
-			return null;
-			*/
 		}
 
 		private string ConvertToString(object value)
@@ -195,6 +286,16 @@ namespace FastXamlServices.MetadataProviderDynamic
 				return ct.ConvertToInvariantString(value);
 			}
 			return value.ToString();
+		}
+
+		private object ConvertFromString(Type expected, string str)
+		{
+			var ct = GetTypeConverter(expected);
+			if (ct != null)
+			{
+				return ct.ConvertFromInvariantString(str);
+			}
+			throw new Exception("Unable to convert value from string for " + expected.Name);
 		}
 
 		bool IsInAttrib(object propertyValue)
@@ -215,7 +316,7 @@ namespace FastXamlServices.MetadataProviderDynamic
 			return false;
 		}
 
-		void UniversalWriterSubnodes(SerializationContext ctx, object instance, IEnumerable<Element> elements)
+		void UniversalWriterSubnodes(SerializationWriterContext ctx, object instance, IEnumerable<Element> elements)
 		{
 			// PROPERTY as SUBNODE:
 			// composite not null
