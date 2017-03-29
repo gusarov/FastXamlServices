@@ -45,8 +45,7 @@ namespace FastXamlServices.MetadataProviderDynamic
 
 		public Func<SerializationReaderContext, object> GetReader(Type type)
 		{
-			/*
-
+/*
 var obj = Activator.CreateInstance(type);
 
 foreach (var attrib in nodeAttribs)
@@ -279,6 +278,7 @@ foreach (var attrib in nodeAttribs)
 		{
 			if (value is DateTime)
 			{
+				// couple hacks to make "o" format shorter!
 				var dt = (DateTime)value;
 				if (dt.TimeOfDay == default(TimeSpan))
 				{
@@ -356,8 +356,9 @@ foreach (var attrib in nodeAttribs)
 						if (subList != null)
 						{
 							ctx.Result.AppendLine();
-							foreach (var item in subList)
+							for (int index = 0; index < subList.Count; index++)
 							{
+								var item = subList[index];
 								GetWriter(item.GetType())(ctx, item);
 							}
 						}

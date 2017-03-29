@@ -6,11 +6,11 @@ namespace FastXamlServices.MetadataProviderDynamic
 {
 	class TypeMetadata
 	{
-		private Type type;
+		private readonly Type _type;
 
 		public TypeMetadata(Type type)
 		{
-			this.type = type;
+			_type = type;
 			Elements = new List<Element>(GetElementsCore(type));
 
 			if (IsX())
@@ -19,9 +19,10 @@ namespace FastXamlServices.MetadataProviderDynamic
 			}
 			else
 			{
-				var attrs = type.Assembly.GetCustomAttributes(typeof(XmlnsDefinitionAttribute), true);
-				foreach (XmlnsDefinitionAttribute attr in attrs)
+				var attrs = (XmlnsDefinitionAttribute[])type.Assembly.GetCustomAttributes(typeof(XmlnsDefinitionAttribute), true);
+				for (int index = 0; index < attrs.Length; index++)
 				{
+					var attr = attrs[index];
 					if (attr.ClrNamespace == type.Namespace)
 					{
 						XmlNamespace = attr.XmlNamespace;
@@ -38,11 +39,12 @@ namespace FastXamlServices.MetadataProviderDynamic
 
 		public bool IsX()
 		{
-			return type.IsPrimitive || type == typeof(string) || type.IsValueType;
+			return _type.IsPrimitive || _type == typeof(string) || _type.IsValueType;
 		}
+
 		public bool IsBody()
 		{
-			return type.IsPrimitive || type == typeof(string) || type.IsValueType;
+			return _type.IsPrimitive || _type == typeof(string) || _type.IsValueType;
 		}
 
 		IEnumerable<Element> GetElementsCore(Type type)
@@ -63,7 +65,7 @@ namespace FastXamlServices.MetadataProviderDynamic
 			}
 		}
 
-		public string XmlNamespace;
+		public readonly string XmlNamespace;
 
 		public IList<Element> Elements { get; }
 	}
